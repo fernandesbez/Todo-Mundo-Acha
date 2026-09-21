@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+  TODO MUNDO ACHA — jornal interativo, e molde livre para outras edições.
+  Código sob licença MIT; texto da edição sob licença CC BY 4.0.
+
+  Este arquivo quase nunca precisa mudar. Para fazer uma edição nova,
+  mexa só em edicao.js (comece por uma cópia de exemplos/edicao-em-branco.js).
+
+  A página abre por duplo clique, sem servidor e sem internet: nenhum
+  arquivo vem de fora desta pasta.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Todo Mundo Acha</title>
+<meta name="description" content="Jornal interativo sobre métodos de pesquisa em psicologia social. Modelo de página, não é um veículo oficial da UFRN.">
+<link rel="stylesheet" href="css/estilo.css">
+
+<!--
+  REDE DE SEGURANÇA (1 de 2): erro de SINTAXE em edicao.js.
+  Uma vírgula ou uma aspa fora do lugar impede o arquivo inteiro de rodar,
+  e window.EDICAO nunca chega a existir. Este ouvinte, que precisa vir
+  ANTES de edicao.js, anota o arquivo e a linha do erro; o motor
+  (js/jornal.js) transforma isso numa mensagem em português no topo da
+  página. Sem ele, o leitor veria uma página em branco e nenhuma pista.
+-->
+<script>
+window.addEventListener("error", function (evento) {
+  // Falha ao CARREGAR um arquivo (script ausente, por exemplo) não é erro de
+  // sintaxe: esse evento não tem "message" e vem do próprio elemento.
+  if (!evento.message || evento.target !== window) { return; }
+  if (window.__JORNAL_ERRO_DE_SCRIPT__) { return; }
+  var arquivo = evento.filename ? String(evento.filename).split("/").pop() : "";
+  // Só interessa erro vindo de arquivo .js carregado por esta página.
+  if (arquivo && arquivo.indexOf(".js") === -1) { return; }
+  window.__JORNAL_ERRO_DE_SCRIPT__ = {
+    arquivo: arquivo || "edicao.js",
+    linha: evento.lineno || 0,
+    coluna: evento.colno || 0,
+    mensagem: evento.message ? String(evento.message) : ""
+  };
+}, true);
+</script>
+</head>
+<body>
+
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!--
+  REDE DE SEGURANÇA (2 de 2): navegador sem JavaScript.
+  O molde precisa de JavaScript para montar a página a partir de edicao.js.
+  Quem abre sem JavaScript recebe este recado, e não uma folha vazia.
+-->
+<noscript>
+  <div class="jornal">
+    <div class="aviso-erro" role="alert">
+      <div class="aviso-erro__marca" aria-hidden="true">!</div>
+      <div class="aviso-erro__conteudo">
+        <p class="rotulo aviso-erro__rotulo">JavaScript desligado</p>
+        <h2 class="aviso-erro__titulo">Esta página precisa de JavaScript para ser montada</h2>
+        <p class="aviso-erro__texto">O texto desta edição fica no arquivo <code>edicao.js</code>, e é o
+        JavaScript do próprio computador que o transforma na página de jornal. Nada é buscado na internet.</p>
+        <ul class="aviso-erro__lista">
+          <li class="aviso-erro__item">Ligue o JavaScript nas configurações do navegador e recarregue a página.
+            <span class="aviso-erro__dica">Dica: no Chrome e no Edge, Configurações → Privacidade e segurança →
+            Configurações do site → JavaScript.</span></li>
+          <li class="aviso-erro__item">Se preferir ler sem JavaScript, use a versão em PDF desta edição.
+            <span class="aviso-erro__dica">Dica: o PDF traz a página inteira, com as interações já resolvidas.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</noscript>
+
+<!-- A folha do jornal. O motor monta tudo aqui dentro. -->
+<div class="jornal"></div>
+
+<!--
+  ORDEM DOS SCRIPTS — importa, e é esta:
+    1. edicao.js       o conteúdo (window.EDICAO). É o arquivo do editor.
+    2. js/jornal.js    o motor: confere o conteúdo e monta a página.
+    3. js/interacoes.js as três interações, ligadas depois que a página está montada.
+  Todos são scripts CLÁSSICOS (sem type="module"): módulo não carrega por
+  duplo clique, em file://. Nenhum vem de fora desta pasta.
+-->
+<script src="edicao.js"></script>
+<script src="js/jornal.js"></script>
+<script src="js/interacoes.js"></script>
+
+</body>
+</html>

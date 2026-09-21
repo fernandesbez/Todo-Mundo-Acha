@@ -1,0 +1,1507 @@
+/* =====================================================================
+   TODO MUNDO ACHA — estilo.css
+   Sistema visual do jornal (molde reutilizável). Licença: MIT.
+
+   COMO LER ESTE ARQUIVO
+   ---------------------
+   1. Fontes          → @font-face (arquivos em ../fontes/)
+   2. TOKENS          → tudo o que você troca para mudar a cara do jornal
+                        (cores, fontes, tamanhos, espaços). COMECE AQUI.
+   3. Base            → reset, texto, links, foco
+   4. A folha         → o "papel", a faixa de aviso e o cabeçalho (título do jornal)
+   5. A grade         → como as matérias e caixas se distribuem na página
+   6. Blocos          → manchete, matéria, caixa, editorial, "para ir além", expediente
+   7. Interações      → I1 (classifique a pergunta), I2 (variável escondida),
+                        I3 (três caminhos), com todos os estados
+   8. Avisos e utilitários
+   9. Acessibilidade  → movimento reduzido e modo de alto contraste
+  10. Impressão       → @media print (A4, resultado das interações já revelado)
+
+   REGRAS DE OURO (não quebre ao editar)
+   -------------------------------------
+   • Cor nunca é a única pista: sempre há texto, forma ou ícone junto.
+   • Contraste: texto normal >= 4,5:1; bordas e ícones de componentes >= 3:1.
+     Se trocar uma cor, confira o par (papel x tinta, etc.) antes.
+   • Nada de "outline: none" sem substituto: o foco precisa aparecer.
+   • Nomes de classe seguem BEM em português:  bloco__elemento--modificador.
+   • Sem JavaScript o jornal continua legível: o conteúdo "revelado" das
+     interações aparece por padrão. Só quando o script marca <html class="com-js">
+     é que o repouso das interações esconde as respostas.
+   ===================================================================== */
+
+
+/* =====================================================================
+   1. FONTES  (todas SIL OFL 1.1, autohospedadas; texto da licença ao lado)
+   ===================================================================== */
+
+/* Títulos e manchetes — Old Standard TT */
+@font-face {
+  font-family: "Old Standard TT"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fontes/old-standard-tt-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Old Standard TT"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("../fontes/old-standard-tt-latin-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Old Standard TT"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fontes/old-standard-tt-latin-700-normal.woff2") format("woff2");
+}
+
+/* Texto corrido — Libre Caslon Text */
+@font-face {
+  font-family: "Libre Caslon Text"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fontes/libre-caslon-text-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Libre Caslon Text"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("../fontes/libre-caslon-text-latin-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Libre Caslon Text"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fontes/libre-caslon-text-latin-700-normal.woff2") format("woff2");
+}
+
+/* Rótulos, datas, legendas — Archivo Narrow (condensada) */
+@font-face {
+  font-family: "Archivo Narrow"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fontes/archivo-narrow-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Archivo Narrow"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("../fontes/archivo-narrow-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Archivo Narrow"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fontes/archivo-narrow-latin-700-normal.woff2") format("woff2");
+}
+
+
+/* =====================================================================
+   2. TOKENS — troque aqui para mudar a cara do jornal
+   ===================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- Papel e tinta (papéis semânticos, não nomes de cor) ---- */
+  --fundo:   #E6EAE3;   /* a "mesa" atrás da folha */
+  --papel:   #FBFCFA;   /* a folha */
+  --papel-2: #F0F3EE;   /* caixas e fundos sutis */
+  --papel-3: #E4E9E1;   /* fundos de ênfase (abas, marcadores) */
+  --tinta:   #16202A;   /* texto principal e filetes grossos */
+  --tinta-2: #3F4F5F;   /* texto secundário (linha fina, notas) */
+  --tinta-3: #526272;   /* rótulos e legendas em caixa-alta */
+
+  --filete:  #B7BFB4;   /* filete fino decorativo (separa blocos) */
+  --borda:   #748394;   /* borda de COMPONENTE (opção, botão): >= 3:1 */
+
+  --link:    #1A4E96;
+  --foco:    #1F56C2;   /* anel de foco: >= 3:1 sobre papel, papel-2 e papel-3 */
+
+  /* ---- Cor semântica por método (cada método tem SEMPRE a mesma cor) ---- */
+  --observar:         #2A6B44;   --observar-fundo:      #E2EFE6;
+  --experimentar:     #2A5A9E;   --experimentar-fundo:  #E1E9F5;
+  --perguntar:        #8F5A12;   --perguntar-fundo:     #F4EAD8;
+
+  /* ---- Retorno ao leitor ---- */
+  --acerto:   #1D6B43;   --acerto-fundo:  #E1F0E6;
+  --atencao:  #A3301F;   --atencao-fundo: #F9E7E2;   /* erro, chapéu da manchete, "variável escondida" */
+
+  /* ---- Fontes ---- */
+  --fonte-titulo: "Old Standard TT", "Times New Roman", Georgia, serif;
+  --fonte-texto:  "Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --fonte-rotulo: "Archivo Narrow", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+
+  /* ---- Escala tipográfica (rem: respeita o tamanho de letra do leitor) ---- */
+  --t-rotulo:  0.8125rem;   /* 13px  rótulos em caixa-alta */
+  --t-nota:    0.9375rem;   /* 15px  fontes, referências, legendas */
+  --t-corpo:   1.0625rem;   /* 17px  texto corrido */
+  --t-lead:    1.25rem;     /* 20px  abertura, destaque */
+  --t-caixa:   1.5rem;      /* 24px  título de caixa */
+  --t-materia: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);          /* título de matéria */
+  --t-linha-fina: clamp(1.2rem, 1.05rem + 0.7vw, 1.6rem);       /* linha fina da manchete */
+  --t-manchete:   clamp(2.25rem, 1.2rem + 4.6vw, 4.75rem);      /* manchete */
+  --t-nome:       clamp(2rem, calc((100vw - 3rem) / 8.3), 7rem); /* título do jornal: cabe numa linha */
+  --entrelinha: 1.55;
+
+  /* ---- Escala de espaço ---- */
+  --e1: 0.25rem;  --e2: 0.5rem;  --e3: 0.75rem;  --e4: 1rem;
+  --e5: 1.5rem;   --e6: 2rem;    --e7: 3rem;     --e8: 4rem;
+
+  /* ---- Grade ---- */
+  --largura-folha: 75rem;      /* 1200px */
+  --margem: 1.25rem;           /* recuo lateral da folha (cresce em telas maiores) */
+  --calha: 1.25rem;            /* respiro interno de cada célula, junto ao filete vertical */
+
+  /* ---- Forma ---- */
+  --raio: 2px;                 /* jornal tem canto reto */
+  --sombra-folha: 0 1px 2px rgba(22, 32, 42, 0.12), 0 18px 48px -18px rgba(22, 32, 42, 0.28);
+  --alvo-min: 2.75rem;         /* 44px: alvo de toque/clique */
+  --impressao-fonte: 7.5pt;    /* tamanho-base no papel (corpo de jornal). Se a edição não couber em 3 páginas A4, reduza aqui */
+}
+
+@media (min-width: 45rem)    { :root { --margem: 2rem; } }
+@media (min-width: 68.75rem) { :root { --margem: 2.5rem; --calha: 1.5rem; } }
+
+/* ---- Modo escuro (segue a preferência do sistema; o impresso é sempre claro) ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0D1116;  --papel: #161D25;  --papel-2: #1D2630;  --papel-3: #26313D;
+    --tinta: #E7ECE6;  --tinta-2: #B9C4CD;  --tinta-3: #9AA9B6;
+    --filete: #37434F;  --borda: #7A8A9B;
+    --link: #8DB6F2;   --foco: #8DB6F2;
+
+    --observar: #7CC79A;      --observar-fundo: #1A2B22;
+    --experimentar: #8DB4F0;  --experimentar-fundo: #1A2536;
+    --perguntar: #E0AE62;     --perguntar-fundo: #2E2618;
+
+    --acerto: #7CC79A;   --acerto-fundo: #193024;
+    --atencao: #F09A88;  --atencao-fundo: #38201C;
+
+    --sombra-folha: 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 48px -18px rgba(0, 0, 0, 0.7);
+  }
+}
+
+
+/* =====================================================================
+   3. BASE
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: var(--t-corpo);
+  line-height: var(--entrelinha);
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--fonte-titulo); font-weight: 700; line-height: 1.12; text-wrap: balance; }
+p { margin: 0 0 1em; text-wrap: pretty; }
+p:last-child { margin-bottom: 0; }
+ul, ol { margin: 0; padding: 0; }
+b, strong { font-weight: 700; }
+em, i { font-style: italic; }
+figure { margin: 0; }
+button, input { font: inherit; color: inherit; }
+code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.9em; }
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-thickness: 0.16em; }
+
+/* Foco: sempre visível, nunca escondido (não há cabeçalho fixo neste layout) */
+:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Só para a galeria estados.html: mostra o anel de foco sem precisar de teclado */
+.simula-foco { outline: 3px solid var(--foco); outline-offset: 3px; border-radius: 2px; }
+
+/* Rótulo em caixa-alta: a "voz" de legenda do jornal */
+.rotulo {
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  color: var(--tinta-3);
+  margin: 0;
+}
+
+/* Só para leitores de tela */
+.so-leitor {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Link de atalho "pular para o conteúdo": aparece só quando recebe foco */
+.pular {
+  position: absolute; left: var(--e4); top: -4rem; z-index: 10;
+  padding: var(--e3) var(--e4);
+  background: var(--tinta); color: var(--papel);
+  font: 700 var(--t-nota) var(--fonte-rotulo);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pular:focus { top: var(--e4); }
+
+
+/* =====================================================================
+   4. A FOLHA — papel, faixa de aviso, cabeçalho
+   ===================================================================== */
+
+.jornal {
+  max-width: var(--largura-folha);
+  margin: 0 auto;
+  padding-inline: var(--margem);
+  padding-bottom: var(--e7);
+  background: var(--papel);
+}
+@media (min-width: 45rem) {
+  .jornal {
+    margin-block: var(--e5);
+    border: 1px solid var(--filete);
+    box-shadow: var(--sombra-folha);
+  }
+}
+
+/* Faixa do topo: nota de modelo (Q7-c). Vai da borda à borda da folha. */
+.jornal__aviso-modelo {
+  margin-inline: calc(var(--margem) * -1);
+  padding: var(--e2) var(--margem);
+  background: var(--tinta);
+  color: var(--papel);
+  text-align: center;
+  font: 600 var(--t-nota) / 1.35 var(--fonte-rotulo);
+  letter-spacing: 0.03em;
+}
+
+/* Blocos largos: rompem o recuo da folha pela "calha", para que filetes
+   horizontais de cabeçalho, grade e rodapé comecem e terminem no mesmo ponto. */
+.jornal__cabecalho,
+.jornal__corpo,
+.jornal__rodape {
+  margin-inline: calc(var(--calha) * -1);
+}
+
+/* ---- Cabeçalho: título do jornal, lema, faixa de edição/data/local ---- */
+.jornal__cabecalho {
+  padding: var(--e5) var(--calha) 3px;
+  text-align: center;
+  border-bottom: 3px solid var(--tinta);
+  margin-top: var(--e5);
+  border-top: 5px double var(--tinta);
+}
+
+.jornal__nome {
+  font-size: var(--t-nome);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  padding-top: var(--e2);
+}
+
+.jornal__lema {
+  margin: var(--e3) auto var(--e4);
+  font-family: var(--fonte-titulo);
+  font-style: italic;
+  font-size: var(--t-lead);
+  line-height: 1.3;
+  color: var(--tinta-2);
+  max-width: 40rem;
+}
+
+.jornal__faixa {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--e1) var(--e4);
+  margin: 0 calc(var(--calha) * -1);
+  padding: var(--e2) var(--calha);
+  border-top: 1px solid var(--tinta);
+  border-bottom: 1px solid var(--tinta);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.jornal__faixa > * { margin: 0; }
+@media (max-width: 44.99rem) {
+  .jornal__faixa { justify-content: center; text-align: center; }
+}
+
+
+/* =====================================================================
+   5. A GRADE
+   Doze colunas. Cada bloco declara quantas ocupa em duas variáveis:
+     --c  em telas largas (>= 1100px)
+     --t  em telas médias (>= 720px)
+   Abaixo de 720px tudo vira uma coluna, na ordem do HTML (a ordem de
+   leitura NUNCA é alterada por CSS).
+   Filetes: cada célula tem um filete fino em cima e (em telas largas) um à
+   esquerda; juntos formam a "malha" de coluna de jornal.
+   ===================================================================== */
+
+.jornal__corpo {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  /* esconde só o filete esquerdo da 1ª coluna (1px) sem cortar o anel de foco */
+  clip-path: inset(-1rem -1rem -1rem 1px);
+}
+
+.jornal__corpo > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: var(--e5) var(--calha) var(--e6);
+  border-top: 1px solid var(--filete);
+}
+
+@media (min-width: 45rem) {
+  .jornal__corpo > * { grid-column: span var(--t, 12); }
+}
+@media (min-width: 68.75rem) {
+  .jornal__corpo > * {
+    grid-column: span var(--c, 12);
+    border-inline-start: 1px solid var(--filete);
+  }
+}
+
+/* As classes .largura--* (que mudam --c e --t de um bloco) ficam no fim da seção 7,
+   depois de todos os blocos, para vencerem o padrão de cada um. */
+
+
+/* =====================================================================
+   6. BLOCOS
+   ===================================================================== */
+
+/* ---- 6.1 Manchete ---- */
+.manchete {
+  --c: 8; --t: 12;
+  display: flex;
+  flex-direction: column;
+  padding-block: var(--e6);
+}
+.manchete__chapeu {
+  align-self: flex-start;
+  margin: 0 0 var(--e4);
+  padding-top: var(--e2);
+  border-top: 4px solid var(--atencao);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atencao);
+}
+.manchete__titulo {
+  font-size: var(--t-manchete);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--e4);
+}
+.manchete__linha-fina {
+  max-width: 38rem;
+  margin: 0 0 var(--e5);
+  font-family: var(--fonte-titulo);
+  font-style: italic;
+  font-size: var(--t-linha-fina);
+  line-height: 1.32;
+  color: var(--tinta-2);
+}
+.manchete__corpo { margin: 0 0 var(--e4); max-width: 38rem; }
+.manchete__corpo p { hyphens: auto; -webkit-hyphens: auto; }
+.manchete__corpo p + p { margin-top: 0.85em; }
+@media (min-width: 68.75rem) {
+  .manchete__corpo { max-width: none; column-count: 2; column-gap: var(--e6); column-rule: 1px solid var(--filete); }
+  .manchete__corpo p { orphans: 3; widows: 3; }
+}
+.manchete__autoria {
+  margin: auto 0 0;
+  padding-top: var(--e3);
+  border-top: 1px solid var(--filete);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+}
+.manchete__autoria b { color: var(--tinta); font-weight: 700; }
+
+/* ---- 6.2 Matéria ---- */
+.materia { --c: 4; --t: 6; }
+
+.materia__secao { margin-bottom: var(--e2); color: var(--tinta-3); }
+.materia__titulo {
+  font-size: var(--t-materia);
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  margin-bottom: var(--e3);
+}
+.materia__linha-fina {
+  margin: 0 0 var(--e4);
+  font-family: var(--fonte-titulo);
+  font-style: italic;
+  font-size: var(--t-lead);
+  line-height: 1.35;
+  color: var(--tinta-2);
+}
+.materia__corpo { max-width: 36rem; }   /* ~65 caracteres por linha em coluna única */
+.materia__corpo p { hyphens: auto; -webkit-hyphens: auto; }
+.materia__corpo p + p { text-indent: 1.4em; margin-top: 0; }
+/* Sem recuo de parágrafo em telas estreitas: em coluna única fica mais legível com espaço entre parágrafos */
+@media (max-width: 44.99rem) {
+  .materia__corpo p + p { text-indent: 0; margin-top: 1em; }
+}
+
+/* Matéria larga: texto em duas colunas (só em tela larga) */
+@media (min-width: 68.75rem) {
+  .materia.largura--dois-tercos .materia__corpo {
+    max-width: none;
+    column-count: 2;
+    column-gap: var(--e6);
+    column-rule: 1px solid var(--filete);
+  }
+  .materia.largura--dois-tercos .materia__corpo p { break-inside: auto; orphans: 3; widows: 3; }
+}
+
+/* Letra capitular (opcional): adicione .materia--capitular */
+.materia--capitular .materia__corpo p:first-child::first-letter {
+  float: left;
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: 3.6em;
+  line-height: 0.82;
+  padding: 0.06em 0.1em 0 0;
+  color: var(--tinta);
+}
+
+/* Linha de fontes (matéria, manchete, caixa, editorial): "Fontes: Nome  p. 58–59 · Nome ..." */
+.fontes {
+  margin: var(--e4) 0 0;
+  padding-top: var(--e3);
+  border-top: 1px solid var(--filete);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  line-height: 1.4;
+  color: var(--tinta-2);
+}
+.fontes__rotulo { display: inline; margin-right: 0.5em; }
+.fontes__lista { display: inline; list-style: none; margin: 0; padding: 0; }
+.fontes__item { display: inline; }
+.fontes__item + .fontes__item::before { content: " · "; color: var(--tinta-3); }
+.fontes__nome { font-weight: 700; color: var(--tinta); text-decoration-color: var(--filete); }
+.fontes__paginas { white-space: nowrap; }
+
+/* Parágrafo que começa com rótulo em negrito (ex.: "**Existência.** …"): vira item de lista */
+.paragrafo--rotulo {
+  margin: 0.55em 0;
+  padding: 0.1em 0 0.1em var(--e3);
+  border-left: 3px solid var(--tinta);
+  text-indent: 0 !important;
+  break-inside: avoid;
+}
+.paragrafo--rotulo > b:first-child {
+  display: block;
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  color: var(--tinta);
+}
+
+/* ---- 6.3 Trilho: coluna lateral que agrupa várias caixas ---- */
+.jornal__corpo > .trilho {
+  --c: 4; --t: 12;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.trilho > .caixa {
+  flex: 0 0 auto;
+  padding: var(--e5) var(--calha) var(--e6);
+}
+.trilho > .caixa:last-child { flex: 1 1 auto; }   /* a última preenche o resto da coluna */
+.trilho > .caixa + .caixa { border-top: 1px solid var(--filete); }
+
+/* ---- 6.4 Caixa (box) ---- */
+/* O quadro do jornal é CERCADO, não um painel que flutua: filete grosso em cima
+   e fino embaixo, como um box de matéria no impresso. Sem isso a caixa lê como
+   um cartão de aplicativo pousado na página. */
+.caixa {
+  --c: 4; --t: 6;
+  background: var(--papel-2);
+  border-top: 3px solid var(--tinta);
+  border-bottom: 1px solid var(--tinta);
+  padding-top: var(--e4);
+  padding-bottom: var(--e4);
+}
+.caixa__rotulo { margin-bottom: var(--e2); }
+.caixa__titulo {
+  font-size: var(--t-caixa);
+  line-height: 1.12;
+  margin-bottom: var(--e3);
+}
+.caixa__instrucao {
+  margin: 0 0 var(--e4);
+  color: var(--tinta-2);
+  font-size: var(--t-nota);
+  line-height: 1.45;
+}
+.caixa__corpo p { hyphens: auto; -webkit-hyphens: auto; }
+
+/* Caixa destaque: a caixa lateral do jornal (título + texto), com filete grosso em cima */
+.caixa--destaque {
+  background: var(--papel-2);
+  border-top: 4px solid var(--tinta);
+}
+.caixa--destaque .caixa__rotulo { color: var(--atencao); }
+.caixa--destaque .caixa__corpo p { font-size: 1rem; line-height: 1.5; }
+.caixa--destaque .caixa__corpo p + p { margin-top: 0.75em; }
+
+/* Caixa citação (opcional, para frases de efeito curtas): use .caixa--citacao */
+.caixa--citacao {
+  background: transparent;
+  border-top: 4px solid var(--tinta);
+}
+.caixa--citacao .caixa__titulo { display: none; }
+.caixa--citacao .caixa__corpo {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.caixa--citacao .caixa__corpo::before {
+  content: "C";
+  content: "C" / "";
+  display: block;
+  height: 0.55em;
+  font-size: 3.2em;
+  line-height: 0.9;
+  color: var(--atencao);
+}
+
+/* ---- 6.5 Editorial ---- */
+.editorial {
+  --c: 12; --t: 12;
+  padding-block: var(--e6) var(--e7);
+  border-top: 3px double var(--tinta) !important;
+}
+.editorial__rotulo { text-align: center; color: var(--atencao); margin-bottom: var(--e3); }
+.editorial__titulo {
+  text-align: center;
+  font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.9rem);
+  line-height: 1.08;
+  max-width: 44rem;
+  margin: 0 auto var(--e5);
+}
+.editorial__corpo { max-width: 38rem; margin-inline: auto; }
+.editorial__corpo p { hyphens: auto; -webkit-hyphens: auto; }
+.editorial__corpo p + p { text-indent: 1.4em; }
+@media (min-width: 68.75rem) {
+  .editorial__corpo {
+    max-width: none;
+    column-count: 2;
+    column-gap: var(--e7);
+    column-rule: 1px solid var(--filete);
+  }
+}
+@media (max-width: 44.99rem) {
+  .editorial__corpo p + p { text-indent: 0; margin-top: 1em; }
+}
+
+/* ---- 6.6 Para ir além: chamadas de rodapé em colunas separadas por filete ---- */
+.alem { --c: 12; --t: 12; background: var(--papel-2); }
+.alem__cabecalho { margin-bottom: var(--e5); text-align: center; }
+.alem__titulo { font-size: var(--t-caixa); margin-top: var(--e1); }
+
+.alem__lista {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-inline: calc(var(--calha) * -1);
+}
+.chamada {
+  padding: var(--e4) var(--calha);
+  border-top: 1px solid var(--filete);
+  min-width: 0;
+}
+@media (min-width: 45rem) {
+  .alem__lista { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chamada:nth-child(even) { border-inline-start: 1px solid var(--filete); }
+}
+@media (min-width: 68.75rem) {
+  .alem__lista { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chamada:nth-child(even) { border-inline-start: 0; }
+  .chamada:not(:nth-child(3n + 1)) { border-inline-start: 1px solid var(--filete); }
+}
+.chamada__rotulo { margin-bottom: var(--e1); }
+.chamada__titulo {
+  font-size: 1.25rem;
+  line-height: 1.18;
+  margin-bottom: var(--e2);
+}
+.chamada__texto { margin: 0 0 var(--e2); font-size: 1rem; line-height: 1.5; }
+.chamada__cuidado {
+  margin: 0 0 var(--e3);
+  padding-left: var(--e3);
+  border-left: 3px solid var(--atencao);
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--tinta-2);
+}
+.chamada__cuidado b {
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atencao);
+  margin-right: 0.35em;
+}
+.chamada__ref {
+  margin: 0;
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  line-height: 1.4;
+  color: var(--tinta-2);
+  overflow-wrap: anywhere;
+}
+
+/* ---- 6.6b Referências (fontes da disciplina e complementares) ---- */
+.referencias { --c: 12; --t: 12; }
+.referencias__cabecalho { margin-bottom: var(--e4); text-align: center; }
+.referencias__titulo { font-size: var(--t-caixa); margin-top: var(--e1); }
+.referencias__lista { list-style: none; margin: 0; }
+.referencia {
+  margin: 0 0 var(--e3);
+  padding-left: 1.6rem;
+  text-indent: -1.6rem;                /* recuo francês: padrão de referência ABNT */
+  font-size: var(--t-nota);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.referencia b { font-weight: 700; }
+.referencia:target { outline: 3px solid var(--foco); outline-offset: 3px; }
+@media (min-width: 68.75rem) {
+  .referencias__lista { column-count: 2; column-gap: var(--e6); }
+  .referencia { break-inside: avoid; }
+}
+
+/* ---- 6.7 Expediente (rodapé) ---- */
+.jornal__rodape {
+  margin-top: 0;
+  padding: var(--e5) var(--calha) 0;
+  border-top: 3px solid var(--tinta);
+}
+.expediente__titulo { margin-bottom: var(--e4); text-align: center; }
+.expediente__lista {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e3) var(--e6);
+  margin: 0;
+}
+@media (min-width: 45rem)    { .expediente__lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 68.75rem) { .expediente__lista { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.expediente__lista dt { margin-bottom: 2px; }
+.expediente__lista dd { margin: 0; font-size: var(--t-nota); line-height: 1.45; }
+.expediente__origem { margin: var(--e4) 0 0; text-align: center; font-size: var(--t-nota); color: var(--tinta-2); }
+.expediente__nota {
+  margin: var(--e5) 0 0;
+  padding-top: var(--e3);
+  border-top: 1px solid var(--filete);
+  font-size: var(--t-nota);
+  color: var(--tinta-2);
+  text-align: center;
+}
+
+
+/* =====================================================================
+   7. INTERAÇÕES
+   Padrão: SEM JavaScript, tudo aparece "resolvido". Quando o script marca
+   <html class="com-js">, o repouso passa a esconder as respostas.
+   ===================================================================== */
+
+/* ---- 7.0 Botões (usados nas três interações) ---- */
+/* Botão com gramática de impresso, não de aplicativo: jornal não tem retângulo
+   sólido de CTA. A forma vem do filete — fino em volta, grosso embaixo, como a
+   assinatura de uma chamada —, canto reto, sobre o papel. O peso está na
+   tipografia e no filete, não num bloco de tinta. */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e2);
+  min-height: var(--alvo-min);
+  min-width: var(--alvo-min);
+  padding: var(--e2) var(--e5);
+  border: 1px solid var(--tinta);
+  border-bottom-width: 3px;
+  border-radius: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao:is(:hover, .simula-hover) { background: var(--papel-3); color: var(--tinta); }
+.botao:active { background: var(--papel-2); }
+.botao[disabled], .botao[aria-disabled="true"] {
+  background: var(--papel-3);
+  border-color: var(--borda);
+  color: var(--tinta-3);
+  cursor: not-allowed;
+}
+/* Secundário: o mesmo filete, sem o peso embaixo — hierarquia por espessura,
+   como um fio fino ao lado de um fio grosso na página. */
+.botao--secundario { background: transparent; border-bottom-width: 1px; color: var(--tinta-2); }
+.botao--secundario:is(:hover, .simula-hover) { background: var(--papel-3); border-color: var(--tinta); color: var(--tinta); }
+.botao--secundario:active { background: var(--papel-2); }
+
+/* Estado "ativado" de botão de alternância (aria-expanded / aria-pressed) */
+.botao[aria-expanded="true"], .botao[aria-pressed="true"] {
+  background: var(--atencao-fundo);
+  border-color: var(--atencao);
+  color: var(--atencao);
+}
+/* Marca de continuação, não ícone de acordeão: o triângulo cheio é o sinal que o
+   impresso usa para "vira a página / continua adiante". Aponta para a direita no
+   repouso e para baixo quando aberto. O texto do botão também muda — a forma
+   nunca é a única pista. */
+.botao--revelar::before {
+  content: "";
+  width: 0; height: 0; flex: none;
+  border-style: solid;
+  border-width: 0.36rem 0 0.36rem 0.5rem;
+  border-color: transparent transparent transparent currentColor;
+}
+.botao--revelar[aria-expanded="true"]::before {
+  border-width: 0.5rem 0.36rem 0 0.36rem;
+  border-color: currentColor transparent transparent transparent;
+}
+
+/* ---- 7.1 I1 · Classifique a pergunta ---- */
+.caixa--classificar { --c: 6; --t: 12; }
+
+.classificar__lista { display: grid; }
+/* Atenção: o padding-top de um <fieldset> vem DEPOIS do <legend>. Por isso o
+   espaço entre perguntas é feito com margem + filete embaixo, nunca em cima. */
+.pergunta {
+  min-width: 0;
+  margin: 0 0 var(--e5);
+  padding: 0 0 var(--e5);
+  border: 0;
+  border-bottom: 1px solid var(--filete);
+}
+.pergunta:last-child { margin-bottom: 0; border-bottom: 0; padding-bottom: 0; }
+
+.pergunta__enunciado {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--e3);
+  font-size: 1.125rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.pergunta__numero {
+  display: inline-block;
+  min-width: 1.6em;
+  margin-right: 0.35em;
+  padding: 0 0.3em;
+  background: var(--tinta);
+  color: var(--papel);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.9em;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.pergunta__opcoes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e2);
+}
+@media (min-width: 30rem) and (max-width: 44.99rem) { .pergunta__opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 45rem) and (max-width: 68.74rem) { .pergunta__opcoes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 68.75rem) { .pergunta__opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Opção: um <label> com <input type="radio"> escondido por cima (recebe foco e clique) */
+.opcao {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e1) var(--e3);
+  min-height: var(--alvo-min);
+  padding: var(--e2) var(--e3);
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--papel);
+  font-size: 1rem;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.opcao__campo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; opacity: 0;
+  cursor: pointer;
+}
+.opcao__marca {
+  position: relative;
+  flex: none;
+  width: 1.25rem; height: 1.25rem;
+  border: 2px solid var(--borda);
+  border-radius: 50%;
+  background: var(--papel);
+}
+.opcao__texto { flex: 1 1 0; min-width: min-content; }
+.opcao__estado {
+  flex: 1 0 100%;                              /* o rótulo de estado fica numa 2ª linha, sob o texto */
+  padding-left: calc(1.25rem + var(--e3));
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.opcao__estado:empty { display: none; }
+
+/* Hover */
+.opcao:is(:hover, .simula-hover) { border-color: var(--tinta); background: var(--papel-2); }
+.opcao:is(:hover, .simula-hover) .opcao__marca { border-color: var(--tinta); }
+
+/* Foco: anel na marca (sempre) e em volta da opção inteira (navegadores com :has) */
+.opcao__campo:focus-visible + .opcao__marca,
+.opcao.simula-foco .opcao__marca {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+}
+@supports selector(:has(*)) {
+  .opcao:has(.opcao__campo:focus-visible), .opcao.simula-foco {
+    outline: 3px solid var(--foco);
+    outline-offset: 2px;
+  }
+  .opcao:has(.opcao__campo:focus-visible) .opcao__marca { outline: 0; }
+}
+
+/* Selecionada (o script também põe .opcao--selecionada; :has cobre o uso sem script) */
+.opcao--selecionada {
+  border-color: var(--tinta);
+  box-shadow: inset 0 0 0 1px var(--tinta);
+  background: var(--papel-2);
+}
+.opcao--selecionada .opcao__marca {
+  border-color: var(--tinta);
+  background: radial-gradient(circle, var(--tinta) 0 42%, transparent 46%);
+}
+@supports selector(:has(*)) {
+  .opcao:not(.opcao--correta):not(.opcao--incorreta):has(.opcao__campo:checked) {
+    border-color: var(--tinta);
+    box-shadow: inset 0 0 0 1px var(--tinta);
+    background: var(--papel-2);
+  }
+  .opcao:not(.opcao--correta):not(.opcao--incorreta):has(.opcao__campo:checked) .opcao__marca {
+    border-color: var(--tinta);
+    background: radial-gradient(circle, var(--tinta) 0 42%, transparent 46%);
+  }
+}
+
+/* Correta: verde + marca de verificação + palavra "Correta" (texto no .opcao__estado) */
+.opcao--correta, .opcao--correta.opcao--selecionada {
+  border-color: var(--acerto);
+  box-shadow: inset 0 0 0 1px var(--acerto);
+  background: var(--acerto-fundo);
+}
+.opcao--correta .opcao__marca {
+  border-color: var(--acerto);
+  background: var(--acerto);
+  border-radius: var(--raio);
+}
+.opcao--correta .opcao__marca::after {
+  content: "";
+  position: absolute; left: 0.3rem; top: 0.04rem;
+  width: 0.36rem; height: 0.7rem;
+  border: solid var(--papel);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+.opcao--correta .opcao__estado { color: var(--acerto); }
+
+/* Incorreta: vermelho + "×" + palavra "Incorreta" */
+.opcao--incorreta, .opcao--incorreta.opcao--selecionada {
+  border-color: var(--atencao);
+  box-shadow: inset 0 0 0 1px var(--atencao);
+  background: var(--atencao-fundo);
+}
+.opcao--incorreta .opcao__marca {
+  border-color: var(--atencao);
+  background: var(--atencao);
+  border-radius: var(--raio);
+}
+.opcao--incorreta .opcao__marca::before,
+.opcao--incorreta .opcao__marca::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 0.8rem; height: 2.5px;
+  margin: -1.25px 0 0 -0.4rem;
+  background: var(--papel);
+  transform: rotate(45deg);
+}
+.opcao--incorreta .opcao__marca::after { transform: rotate(-45deg); }
+.opcao--incorreta .opcao__estado { color: var(--atencao); }
+
+/* Feedback (região aria-live) — texto explica, cor apenas reforça */
+.pergunta__feedback {
+  margin: var(--e3) 0 0;
+  padding: var(--e2) var(--e3);
+  border-left: 4px solid var(--borda);
+  background: var(--papel-2);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.pergunta__feedback:empty { display: none; }
+.pergunta__feedback b { font-weight: 700; }
+.pergunta[data-estado="certa"]  .pergunta__feedback { border-color: var(--acerto);  background: var(--acerto-fundo); }
+.pergunta[data-estado="errada"] .pergunta__feedback { border-color: var(--atencao); background: var(--atencao-fundo); }
+
+/* Resolução: tipo + explicação. Visível por padrão; escondida no repouso só com JS */
+.pergunta__resolucao { margin-top: var(--e3); }
+.pergunta__tipo { margin: 0 0 var(--e1); }
+.pergunta__tipo b {
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.pergunta__explicacao { margin: 0; font-size: 1rem; line-height: 1.5; color: var(--tinta-2); }
+.com-js .pergunta[data-estado="repouso"] .pergunta__resolucao { display: none; }
+
+/* Fecho da caixa (texto depois das perguntas) */
+.classificar__fecho { margin: var(--e4) 0 0; font-size: 1rem; line-height: 1.5; color: var(--tinta-2); font-style: italic; }
+
+/* Placar */
+.placar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e3) var(--e4);
+  margin-top: var(--e4);
+  padding-top: var(--e4);
+  border-top: 3px double var(--tinta);
+}
+.placar__texto { margin: 0; font-size: 1.125rem; font-weight: 700; flex: 1 1 100%; }
+.placar .botao { margin-left: auto; }
+.placar__pontos { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.ponto {
+  position: relative;
+  width: 1.25rem; height: 1.25rem;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+.ponto--certo  { border-color: var(--acerto);  background: var(--acerto); }
+.ponto--errado { border-color: var(--atencao); background: var(--papel); }
+.ponto--errado::before, .ponto--errado::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 0.8rem; height: 2px; margin: -1px 0 0 -0.4rem;
+  background: var(--atencao); transform: rotate(45deg);
+}
+.ponto--errado::after { transform: rotate(-45deg); }
+
+/* ---- 7.2 I2 · A variável escondida ---- */
+.caixa--revelar { --c: 4; --t: 12; }
+
+.grafico { margin: 0 auto var(--e4); max-width: 26rem; }
+.grafico__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grafico__legenda { margin-top: var(--e2); font-size: var(--t-nota); line-height: 1.4; color: var(--tinta-2); }
+
+/* Elementos do SVG (a cor vem dos tokens, então o gráfico acompanha o modo escuro) */
+.g-rotulo { font-family: var(--fonte-rotulo); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; fill: var(--tinta); text-transform: uppercase; }
+.g-eixo   { font-family: var(--fonte-rotulo); font-size: 12.5px; fill: var(--tinta-3); }
+.g-base   { stroke: var(--borda); stroke-width: 1; fill: none; }
+.g-serie  { fill: none; stroke-width: 2.75; stroke-linejoin: round; stroke-linecap: round; }
+.g-serie--sorvete  { stroke: var(--tinta); }
+.g-serie--afogados { stroke: var(--tinta-2); stroke-dasharray: 7 4; }
+.g-serie--tempo    { stroke: var(--atencao); stroke-width: 3.5; }
+.g-ponto--sorvete  { fill: var(--tinta); }
+.g-ponto--afogados { fill: var(--papel); stroke: var(--tinta-2); stroke-width: 2; }
+.g-ponto--tempo    { fill: var(--atencao); }
+.g-banda          { fill: var(--atencao-fundo); }
+.g-barra          { fill: var(--atencao-fundo); stroke: var(--atencao); stroke-width: 2; }
+.g-barra-texto    { font-family: var(--fonte-titulo); font-style: italic; font-size: 15px; fill: var(--tinta); }
+/* Traço longo, de filete interrompido, no lugar do pontilhado curto de "área
+   vazia" de formulário: aqui não falta um dado, há um dado escondido. */
+.g-oculta-caixa    { fill: none; stroke: var(--borda); stroke-width: 1.5; stroke-dasharray: 12 5; }
+.g-oculta-texto    { font-family: var(--fonte-titulo); font-style: italic; font-size: 15px; fill: var(--tinta-2); }
+.g-oculta-interrog { font-family: var(--fonte-titulo); font-weight: 700; font-size: 40px; fill: var(--tinta-3); }
+
+/* Sem script: terceira variável visível. Com script: só depois de .esta-revelado */
+.grafico__oculta { display: none; }
+.com-js .caixa--revelar:not(.esta-revelado) .grafico__oculta   { display: block; }
+.com-js .caixa--revelar:not(.esta-revelado) .grafico__terceira { display: none; }
+
+.revelar__antes p { font-size: 1rem; line-height: 1.5; }
+.revelar__subtitulo {
+  margin: 0 0 var(--e1);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.revelar__resposta .revelar__subtitulo { color: var(--atencao); }
+.revelar__explicacao { margin-top: 0.6em; }
+.revelar__acoes { margin: var(--e4) 0; }
+.revelar__resposta {
+  padding: var(--e3) var(--e3) var(--e3) var(--e4);
+  border-left: 4px solid var(--atencao);
+  background: var(--atencao-fundo);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.revelar__resposta p { margin-bottom: 0.6em; }
+.revelar__resposta b { font-weight: 700; }
+.com-js .caixa--revelar:not(.esta-revelado) .revelar__resposta { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .caixa--revelar.esta-revelado .grafico__terceira { animation: aparecer 0.45s ease-out both; }
+  .caixa--revelar.esta-revelado .revelar__resposta { animation: aparecer 0.45s ease-out both; }
+  @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* ---- 7.3 I3 · Três caminhos ---- */
+.caixa--comparar { --c: 12; --t: 12; background: var(--papel); }
+
+/* Métodos: cada um define --metodo e --metodo-fundo; todo componente do método usa só essas duas */
+.metodo--observar     { --metodo: var(--observar);     --metodo-fundo: var(--observar-fundo); }
+.metodo--experimentar { --metodo: var(--experimentar); --metodo-fundo: var(--experimentar-fundo); }
+.metodo--perguntar    { --metodo: var(--perguntar);    --metodo-fundo: var(--perguntar-fundo); }
+
+/* Selo do método: forma + cor (círculo = observar, quadrado = experimentar, losango = perguntar).
+   Desenhado com bordas (não com fundo) para também aparecer no impresso. */
+.selo-metodo::before {
+  content: "";
+  display: inline-block;
+  flex: none;
+  width: 0; height: 0;
+  border: 0.4rem solid var(--metodo);
+  margin-right: 0.45em;
+  vertical-align: -0.1em;
+}
+.metodo--observar     .selo-metodo::before,
+.metodo--observar.selo-metodo::before      { border-radius: 50%; }
+.metodo--experimentar .selo-metodo::before,
+.metodo--experimentar.selo-metodo::before  { border-radius: 0; }
+.metodo--perguntar    .selo-metodo::before,
+.metodo--perguntar.selo-metodo::before     { border-radius: 0; transform: rotate(45deg) scale(0.85); }
+
+.caminhos__abas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: var(--e4);
+}
+.aba {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e1);
+  min-height: 3.75rem;
+  padding: var(--e2) var(--e1);
+  border: 1.5px solid var(--borda);
+  border-top: 5px solid var(--metodo);
+  border-radius: var(--raio) var(--raio) 0 0;
+  background: var(--papel-2);
+  color: var(--tinta);
+  font-family: var(--fonte-rotulo);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  cursor: pointer;
+}
+.aba + .aba { margin-left: -1.5px; }
+.aba__nome { display: flex; align-items: center; }
+.aba:is(:hover, .simula-hover) { background: var(--papel-3); }
+.aba[aria-selected="true"] {
+  background: var(--metodo-fundo);
+  border-bottom-color: var(--metodo-fundo);
+  color: var(--tinta);
+  box-shadow: inset 0 -3px 0 -1px var(--metodo-fundo);
+  position: relative;
+  z-index: 1;
+}
+/* Aba ativa: além da cor, um sublinhado na marca do nome (cor não é a única pista) */
+.aba[aria-selected="true"] .aba__texto {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--metodo);
+}
+
+
+.caminhos__paineis { border: 1.5px solid var(--borda); border-top: 0; background: var(--metodo-fundo, var(--papel-2)); }
+.caminho {
+  padding: var(--e5) var(--calha) var(--e6);
+  background: var(--metodo-fundo);
+  border-top: 4px solid var(--metodo);
+}
+.caminho__rotulo { color: var(--metodo); display: flex; align-items: center; margin-bottom: var(--e2); }
+.caminho__titulo { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); margin-bottom: var(--e2); }
+.caminho__resumo { margin: 0 0 var(--e4); max-width: 38rem; }
+.caminho__caso {
+  margin: 0;
+  padding: var(--e3) var(--e4);
+  background: var(--papel);
+  border-left: 4px solid var(--metodo);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.caminho__caso b {
+  display: block;
+  margin-bottom: var(--e1);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-rotulo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--metodo);
+}
+.caminho__balanco { display: grid; gap: var(--e3); margin: var(--e4) 0 0; align-content: start; }
+.balanco {
+  padding: var(--e3) var(--e4);
+  background: var(--papel);
+  border: 1.5px solid var(--borda);
+}
+.balanco dt {
+  display: flex; align-items: center; gap: var(--e2);
+  margin-bottom: var(--e1);
+  font-family: var(--fonte-rotulo);
+  font-size: var(--t-nota);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.balanco dd { margin: 0; font-size: 1rem; line-height: 1.5; }
+.balanco dd b { font-weight: 700; }
+/* + e − desenhados com CSS, ao lado das palavras "Ganha" e "Perde" */
+.balanco dt::before {
+  content: ""; flex: none; width: 0.8rem; height: 0.8rem;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 3px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 3px 100% no-repeat;
+}
+.balanco--ganha { border-color: var(--metodo); border-width: 2px; }
+.balanco--ganha dt { color: var(--metodo); }
+.balanco--perde dt { color: var(--tinta-2); }
+.balanco--perde dt::before { background: linear-gradient(currentColor, currentColor) center / 100% 3px no-repeat; }
+
+/* Painel largo: texto à esquerda, ganha/perde à direita */
+@media (min-width: 56rem) {
+  .caminho { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--e6); }
+  .caminho__texto { min-width: 0; }
+  .caminho__balanco { margin-top: 0; }
+}
+
+/* Sem script, os três painéis aparecem empilhados. Com script, só o ativo. */
+.com-js .caixa--comparar .caminho:not(.esta-ativo) { display: none; }
+.caminhos__paineis > .caminho + .caminho { border-top-width: 4px; }
+.com-js .caixa--comparar .caminhos__abas { display: grid; }
+.caixa--comparar .caminhos__abas { display: none; }   /* sem JS não há abas: só os painéis */
+
+
+
+/* ---- 7.4 Larguras (12 avos: desktop / tablet) ----
+   Combine com .materia, .caixa, .trilho, .caixa--*. Vêm por último de propósito:
+   precisam vencer o --c/--t padrão de cada bloco. */
+.jornal__corpo > .largura--total        { --c: 12; --t: 12; }
+.jornal__corpo > .largura--dois-tercos  { --c: 8;  --t: 12; }
+.jornal__corpo > .largura--metade       { --c: 6;  --t: 12; }
+.jornal__corpo > .largura--terco        { --c: 4;  --t: 6;  }
+.jornal__corpo > .largura--quarto       { --c: 3;  --t: 6;  }
+
+/* =====================================================================
+   8. AVISOS E UTILITÁRIOS
+   ===================================================================== */
+
+/* Aviso de erro do validador (T4): aparece NO TOPO quando edicao.js falha */
+.aviso-erro {
+  display: flex;
+  gap: var(--e4);
+  margin-inline: calc(var(--margem) * -1);
+  padding: var(--e4) var(--margem);
+  background: var(--atencao-fundo);
+  border-top: 6px solid var(--atencao);
+  border-bottom: 1px solid var(--atencao);
+  color: var(--tinta);
+}
+.aviso-erro__marca {
+  flex: none;
+  display: grid; place-items: center;
+  width: 2.5rem; height: 2.5rem;
+  background: var(--atencao);
+  color: var(--papel);
+  font: 700 1.6rem/1 var(--fonte-rotulo);
+}
+.aviso-erro__conteudo { min-width: 0; max-width: 46rem; }
+.aviso-erro__rotulo { color: var(--atencao); }
+.aviso-erro__titulo { font-size: 1.5rem; margin: var(--e1) 0 var(--e2); }
+.aviso-erro__texto { margin: 0 0 var(--e3); font-size: 1rem; }
+.aviso-erro__lista { margin: 0; padding-left: 1.25rem; font-size: 1rem; }
+.aviso-erro__item { margin-bottom: var(--e2); }
+.aviso-erro__item code {
+  display: inline-block;
+  padding: 0 0.35em;
+  background: var(--papel);
+  border: 1px solid var(--atencao);
+  color: var(--tinta);
+}
+.aviso-erro__dica { display: block; color: var(--tinta-2); font-size: var(--t-nota); }
+
+/* Filetes avulsos */
+.filete { border: 0; border-top: 1px solid var(--tinta); margin: var(--e4) 0; }
+.filete--duplo { border-top: 4px double var(--tinta); }
+.filete--grosso { border-top: 3px solid var(--tinta); }
+
+
+/* =====================================================================
+   9. ACESSIBILIDADE
+   ===================================================================== */
+
+/* Movimento reduzido: nenhuma transição/animação (nenhuma é essencial) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Alto contraste do Windows: usa as cores do sistema */
+@media (forced-colors: active) {
+  .opcao, .aba, .balanco, .botao { border-color: ButtonText; }
+  .opcao--selecionada, .opcao--correta, .opcao--incorreta { border-color: Highlight; }
+  .opcao__marca, .ponto { border-color: ButtonText; forced-color-adjust: none; }
+  .selo-metodo::before { border-color: CanvasText; }
+  .aviso-erro { border-color: CanvasText; }
+}
+
+
+/* =====================================================================
+   10. IMPRESSÃO — A4, no máximo 3 páginas, tinta economizada
+   O estado impresso das interações é o "resolvido":
+     I1 → tipo e explicação de todas as perguntas
+     I2 → terceira variável revelada
+     I3 → os três caminhos lado a lado
+   ===================================================================== */
+
+@page { size: A4; margin: 8mm 9mm 9mm; }
+
+@media print {
+  :root {
+    color-scheme: light;
+    --fundo: #fff; --papel: #fff; --papel-2: #fff; --papel-3: #eee;
+    --tinta: #000; --tinta-2: #1c1c1c; --tinta-3: #333;
+    --filete: #777; --borda: #444;
+    --link: #000; --foco: #000;
+    --observar: #1b5a36;      --observar-fundo: #fff;
+    --experimentar: #1f4a86;  --experimentar-fundo: #fff;
+    --perguntar: #7a4c0d;     --perguntar-fundo: #fff;
+    --acerto: #145233;  --acerto-fundo: #fff;
+    --atencao: #8f2416; --atencao-fundo: #fff;
+
+    --t-rotulo: 0.86rem;
+    --t-nota: 0.95rem;
+    --t-corpo: 1rem;
+    --t-lead: 1.1rem;
+    --t-caixa: 1.2rem;
+    --t-materia: 1.45rem;
+    --t-manchete: 2.6rem;
+    --t-linha-fina: 1.2rem;
+    --t-nome: 3.8rem;
+    --entrelinha: 1.25;
+    --calha: 0;
+    --margem: 0;
+  }
+
+  html { font-size: var(--impressao-fonte); }
+  html, body { background: #fff; }
+  body { color: #000; -webkit-print-color-adjust: economy; print-color-adjust: economy; }
+
+  .pular, .botao, .caminhos__abas, .placar, .pergunta__opcoes, .pergunta__feedback,
+  .revelar__acoes, .aviso-erro { display: none !important; }
+
+  a { color: #000; text-decoration: underline; }
+
+  .jornal {
+    max-width: none; margin: 0; padding: 0; border: 0; box-shadow: none; background: #fff;
+  }
+  .jornal__aviso-modelo {
+    margin: 0 0 2mm; padding: 1mm 0;
+    background: none; color: #000;
+    border-top: 0.5pt solid #000; border-bottom: 0.5pt solid #000;
+    font-size: 0.95rem;
+  }
+  .jornal__cabecalho, .jornal__corpo, .jornal__rodape { margin-inline: 0; padding-inline: 0; }
+  .jornal__cabecalho { margin-top: 0; padding-top: 2mm; }
+  .jornal__faixa { margin-inline: 0; padding-inline: 0; }
+  .jornal__nome { padding-top: 0; }
+  .jornal__lema { margin-block: 1mm 2mm; }
+
+  /* A grade vira colunas de jornal: mais compacta e sem buracos entre linhas */
+  .jornal__corpo {
+    display: block;
+    clip-path: none;
+    column-count: 3;
+    column-gap: 6mm;
+    /* sem column-rule: no Chrome o filete vertical atravessa as faixas de largura total */
+  }
+  /* Texto das caixas em condensada: cabe mais em pouco espaço (padrão de jornal) */
+  .caixa__corpo, .caixa__instrucao, .pergunta__explicacao, .pergunta__enunciado,
+  .caminho__resumo, .caminho__caso, .balanco dd, .chamada__texto, .chamada__cuidado,
+  .revelar__resposta, .revelar__antes p, .grafico__legenda, .fontes, .referencia, .paragrafo--rotulo {
+    font-family: var(--fonte-rotulo);
+    font-size: 1.04rem;
+    line-height: 1.24;
+    letter-spacing: 0;
+  }
+  .pergunta__enunciado { font-weight: 700; font-size: 1.08rem; }
+  .jornal__corpo > * {
+    padding: 0 0 3mm;
+    border: 0;
+    background: none;
+    grid-column: auto;
+  }
+  .jornal__corpo > .trilho { display: contents; }
+  .trilho > .caixa { padding: 2.5mm; }
+
+  /* Faixas que atravessam todas as colunas */
+  .manchete, .caixa--classificar, .caixa--comparar, .editorial, .alem { column-span: all; }
+
+  .manchete { display: block; padding: 3mm 0 3mm; border-bottom: 0.5pt solid #000; margin-bottom: 3mm; }
+  .manchete__titulo { margin-bottom: 2mm; }
+  .manchete__linha-fina { margin-bottom: 2mm; max-width: none; }
+  .manchete__autoria { margin-top: 0; }
+  .manchete__corpo { column-count: 3; column-gap: 6mm; max-width: none; margin-bottom: 2mm; }
+  .manchete__corpo p { orphans: 2; widows: 2; }
+  .paragrafo--rotulo { border-left-width: 1.5pt; margin: 1mm 0; }
+  .referencias { column-span: all; border-top: 0.5pt solid #000 !important; padding-top: 2mm; }
+  .referencias__cabecalho { margin-bottom: 1.5mm; }
+  .referencias__lista { column-count: 2; column-gap: 6mm; }
+  .referencia { margin-bottom: 1.5mm; }
+
+  .materia { padding-top: 2mm; border-top: 0.5pt solid #000 !important; }
+  .materia:first-of-type { border-top: 0 !important; }
+  .materia__corpo { max-width: none; }
+  .materia__corpo p, .editorial__corpo p, .caixa__corpo p { orphans: 3; widows: 3; hyphens: auto; }
+  .materia__corpo p + p { text-indent: 1.2em; }
+  .materia__linha-fina { margin-bottom: 2mm; }
+  .fontes { margin-top: 2mm; padding-top: 1.5mm; }
+
+  h1, h2, h3, h4, .rotulo { break-after: avoid; break-inside: avoid; }
+  .materia__secao, .materia__titulo, .materia__linha-fina, .caixa__rotulo, .caixa__titulo { break-after: avoid; break-inside: avoid; }
+
+  .caixa {
+    border: 0.5pt solid #000; padding: 2.5mm; margin-bottom: 3mm; background: none;
+    break-inside: avoid;
+  }
+  .caixa--destaque { border-width: 2pt 0 0 0; padding: 2mm 0 0; }
+
+  /* I1: perguntas em 3 colunas, cada uma com tipo e explicação */
+  .caixa--classificar { margin: 0 0 3mm; }
+  .classificar__lista { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 5mm; }
+  .pergunta { break-inside: avoid; margin: 0; padding: 0 0 2.5mm; border: 0; }
+  .pergunta:last-child { padding-bottom: 0; }
+  .pergunta__enunciado { font-size: 1rem; margin-bottom: 1mm; }
+  .pergunta__resolucao { display: block !important; margin-top: 0; }
+  .com-js .pergunta[data-estado="repouso"] .pergunta__resolucao { display: block !important; }
+  .pergunta__explicacao { color: #000; font-size: 0.95rem; line-height: 1.35; }
+  .pergunta__numero { border: 0.5pt solid #000; background: none; color: #000; }
+
+  /* I2: gráfico revelado */
+  .caixa--revelar .grafico__oculta { display: none !important; }
+  .caixa--revelar .grafico__terceira { display: block !important; }
+  .caixa--revelar .revelar__resposta {
+    display: block !important;
+    border-left: 2pt solid #000; background: none; padding: 1mm 0 1mm 2.5mm;
+  }
+  .grafico__svg { max-height: 44mm; }
+  .g-serie--tempo { stroke: #000; }
+  .g-ponto--tempo { fill: #000; }
+
+  /* I3: três caminhos lado a lado */
+  .caixa--comparar { border: 0; border-top: 2pt solid #000; padding: 2mm 0 0; }
+  .caminhos__paineis {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0; border: 0; background: none;
+  }
+  .com-js .caixa--comparar .caminho:not(.esta-ativo), .caixa--comparar .caminho { display: block !important; }
+  .caminho {
+    padding: 2mm 3mm 1mm; background: none; border-top: 2.5pt solid var(--metodo);
+    break-inside: avoid;
+  }
+  .caminho + .caminho { border-left: 0.5pt solid #000; }
+  .caminho__titulo { font-size: 1.3rem; }
+  .caminho__resumo { max-width: none; margin-bottom: 2mm; }
+  .caminho__caso { background: none; border-left: 1.5pt solid var(--metodo); padding: 1mm 2mm; margin-bottom: 2mm; }
+  .balanco { background: none; border: 0.5pt solid #000; padding: 1.5mm 2mm; }
+  .caminho__balanco { gap: 1.5mm; }
+  .balanco--ganha { border-width: 1pt; border-color: var(--metodo); }
+  .selo-metodo::before { border-width: 0.32rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Editorial e Para ir além */
+  .editorial { padding: 2mm 0 2mm; border-top: 3pt double #000 !important; margin-top: 1mm; }
+  .editorial__titulo { font-size: 1.7rem; margin-bottom: 2mm; }
+  .editorial__corpo { column-count: 2; column-gap: 6mm; column-rule: 0.5pt solid #000; max-width: none; }
+  .alem { background: none; border-top: 0.5pt solid #000 !important; padding: 2mm 0 0; }
+  .alem__cabecalho { margin-bottom: 1.5mm; }
+  .alem__lista { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-inline: 0; }
+  .chamada { padding: 1.5mm 3mm; break-inside: avoid; border-top: 0.5pt solid #000; }
+  .chamada:nth-child(3n + 1) { padding-left: 0; border-inline-start: 0; }
+  .chamada:not(:nth-child(3n + 1)) { border-inline-start: 0.5pt solid #000; }
+  .chamada__titulo { font-size: 1.1rem; }
+  .chamada__cuidado { border-left-width: 2pt; }
+  .chamada__ref { font-size: 0.85rem; }
+
+  .jornal__rodape { padding-top: 2mm; break-inside: avoid; }
+  .expediente__lista { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2mm 5mm; }
+  .expediente__nota { margin-top: 2mm; padding-top: 1.5mm; }
+
+  /* ---- Compactação para caber em 3 páginas A4 ----
+     Só se omite o que se repete no papel (rótulos "Interativo", título duplicado do
+     caminho, títulos de seção que já têm rótulo). Nenhum conteúdo da edição é cortado. */
+  /* Nada é cortado no meio. Se uma edição maior não couber em 3 páginas, troque avoid por auto
+     (o bloco passa a continuar na página seguinte) ou reduza --impressao-fonte. */
+  .caixa--classificar, .referencias, .alem { break-inside: avoid; }
+  .caixa--classificar .caixa__rotulo, .caixa--comparar .caixa__rotulo, .caixa--revelar .caixa__rotulo,
+  .caminho__titulo, .chamada__rotulo, .alem__titulo, .referencias__titulo, .expediente__titulo { display: none; }
+  .pergunta__tipo, .pergunta__explicacao { display: inline; }             /* "Tipo: causa. Explicação…" na mesma linha */
+  .pergunta__tipo::after { content: " "; }
+  .grafico__svg { max-height: 30mm; }
+  .referencias__lista { column-count: 3; }
+  .jornal__corpo { column-gap: 5mm; }
+  .caixa { padding: 2mm; }
+  .manchete__corpo p + p, .caixa__corpo p + p, .revelar__resposta p { margin-top: 0.3em; margin-bottom: 0; }
+  .paragrafo--rotulo { margin: 0.6mm 0; }
+  .editorial__titulo { font-size: 1.4rem; }
+  .chamada__ref { font-size: 0.8rem; }
+  .chamada__titulo { font-size: 1rem; }
+  .materia__linha-fina { font-size: 1rem; }
+  .expediente__nota, .expediente__origem { margin: 1mm 0 0; padding: 0; border: 0; }
+  .alem__cabecalho, .referencias__cabecalho { margin-bottom: 1mm; }
+  .jornal__rodape { padding-top: 1mm; }
+  .caminho__balanco { margin-top: 0; }
+}
