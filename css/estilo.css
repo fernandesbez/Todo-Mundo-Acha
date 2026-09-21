@@ -85,16 +85,19 @@
   color-scheme: light dark;
 
   /* ---- Papel e tinta (papéis semânticos, não nomes de cor) ---- */
-  --fundo:   #E6EAE3;   /* a "mesa" atrás da folha */
-  --papel:   #FBFCFA;   /* a folha */
-  --papel-2: #F0F3EE;   /* caixas e fundos sutis */
-  --papel-3: #E4E9E1;   /* fundos de ênfase (abas, marcadores) */
+  /* O papel puxa creme, não branco de tela: papel de jornal é quente, e o branco
+     frio era o que mais fazia a página ler como interface. Só a tela — o
+     @media print força #fff, porque impressora não simula papel. */
+  --fundo:   #E4DECF;   /* a "mesa" atrás da folha */
+  --papel:   #FAF7F0;   /* a folha */
+  --papel-2: #F1EDE3;   /* caixas e fundos sutis */
+  --papel-3: #E6E0D2;   /* fundos de ênfase (abas, marcadores) */
   --tinta:   #16202A;   /* texto principal e filetes grossos */
   --tinta-2: #3F4F5F;   /* texto secundário (linha fina, notas) */
   --tinta-3: #526272;   /* rótulos e legendas em caixa-alta */
 
-  --filete:  #B7BFB4;   /* filete fino decorativo (separa blocos) */
-  --borda:   #748394;   /* borda de COMPONENTE (opção, botão): >= 3:1 */
+  --filete:  #C4BCA8;   /* filete fino decorativo (separa blocos) */
+  --borda:   #6E6A5E;   /* borda de COMPONENTE (opção, botão): >= 3:1 */
 
   --link:    #1A4E96;
   --foco:    #1F56C2;   /* anel de foco: >= 3:1 sobre papel, papel-2 e papel-3 */
@@ -121,7 +124,7 @@
   --t-caixa:   1.5rem;      /* 24px  título de caixa */
   --t-materia: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);          /* título de matéria */
   --t-linha-fina: clamp(1.2rem, 1.05rem + 0.7vw, 1.6rem);       /* linha fina da manchete */
-  --t-manchete:   clamp(2.25rem, 1.2rem + 4.6vw, 4.75rem);      /* manchete */
+  --t-manchete:   clamp(2.4rem, 1.25rem + 5.2vw, 5.5rem);       /* manchete */
   --t-nome:       clamp(2rem, calc((100vw - 3rem) / 8.3), 7rem); /* título do jornal: cabe numa linha */
   --entrelinha: 1.55;
 
@@ -144,24 +147,14 @@
 @media (min-width: 45rem)    { :root { --margem: 2rem; } }
 @media (min-width: 68.75rem) { :root { --margem: 2.5rem; --calha: 1.5rem; } }
 
-/* ---- Modo escuro (segue a preferência do sistema; o impresso é sempre claro) ---- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fundo: #0D1116;  --papel: #161D25;  --papel-2: #1D2630;  --papel-3: #26313D;
-    --tinta: #E7ECE6;  --tinta-2: #B9C4CD;  --tinta-3: #9AA9B6;
-    --filete: #37434F;  --borda: #7A8A9B;
-    --link: #8DB6F2;   --foco: #8DB6F2;
-
-    --observar: #7CC79A;      --observar-fundo: #1A2B22;
-    --experimentar: #8DB4F0;  --experimentar-fundo: #1A2536;
-    --perguntar: #E0AE62;     --perguntar-fundo: #2E2618;
-
-    --acerto: #7CC79A;   --acerto-fundo: #193024;
-    --atencao: #F09A88;  --atencao-fundo: #38201C;
-
-    --sombra-folha: 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 48px -18px rgba(0, 0, 0, 0.7);
-  }
-}
+/* ---- Sem modo escuro, de propósito ----
+   Jornal impresso não tem modo escuro: a folha é creme em qualquer luz.
+   Havia aqui um bloco @media (prefers-color-scheme: dark) que trocava a paleta
+   por tons de azul-ardósia — coerente com software, não com este projeto.
+   Quem quiser reintroduzi-lo: a paleta tem de ser da MESMA família terrosa
+   (papel quase-preto quente, tinta creme), nunca azulada, e o contraste precisa
+   ser remedido. O impresso não é afetado nos dois casos: a @media print no fim
+   deste arquivo força --papel: #fff. */
 
 
 /* =====================================================================
@@ -394,10 +387,13 @@ a:hover { text-decoration-thickness: 0.16em; }
   text-transform: uppercase;
   color: var(--atencao);
 }
+/* Manchete de primeira página: densa e dominante. O tracking fecha para -0.03em
+   (o piso prático; -0.04em é o limite absoluto) e a entrelinha comprime para
+   0.98 — em corpo grande, linha de manchete quase se toca, como no impresso. */
 .manchete__titulo {
   font-size: var(--t-manchete);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
   margin: 0 0 var(--e4);
 }
 .manchete__linha-fina {
